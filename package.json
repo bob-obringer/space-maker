@@ -1,0 +1,27 @@
+{
+  "name": "space-maker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A zoomable, live disk-space map for macOS",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bob-obringer/space-maker"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.8.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "vite": "^8.0.16",
+    "typescript": "~6.0.3"
+  }
+}
