@@ -34,6 +34,23 @@ That's about 110 MB for a home folder of roughly 9M files. Reopening a folder
 loads in about half a second, then catches up on everything that changed since.
 Turning the switch off deletes the saved scans immediately.
 
+## Known issues
+
+This is an early release. The scanner, cache and live updates are covered by
+tests against the real filesystem, but the packaged app hasn't had a full
+hands-on pass yet.
+
+- [#1](https://github.com/bob-obringer/space-maker/issues/1) Move to Trash hasn't been tested on real files in the app
+- [#2](https://github.com/bob-obringer/space-maker/issues/2) Trackpad vs. mouse wheel detection is a guess; pinch unverified
+- [#3](https://github.com/bob-obringer/space-maker/issues/3) Live updates and instant launch only verified in tests and the preview
+- [#4](https://github.com/bob-obringer/space-maker/issues/4) Entire Disk scans with live updates may never settle
+- [#5](https://github.com/bob-obringer/space-maker/issues/5) Builds aren't signed or notarized
+- [#6](https://github.com/bob-obringer/space-maker/issues/6) No release pipeline or downloadable .dmg
+- [#7](https://github.com/bob-obringer/space-maker/issues/7) Trash uses the path from the scan, which can be stale
+- [#8](https://github.com/bob-obringer/space-maker/issues/8) Copy Path may silently fail in the app
+- [#9](https://github.com/bob-obringer/space-maker/issues/9) No screenshot in the README
+- [#10](https://github.com/bob-obringer/space-maker/issues/10) The map isn't accessible to VoiceOver
+
 ## Building it
 
 There's no signed download yet, so build it yourself. You need macOS,
