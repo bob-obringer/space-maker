@@ -1,0 +1,82 @@
+name: Release
+
+# Push a tag like v0.2.0 (matching the version in tauri.conf.json) to build a
+# universal .dmg and attach it to a draft GitHub Release.
+#
+# Signing is optional. Without the secrets below, the app is ad-hoc signed and
+# people use "Open Anyway" the first time. Add these repository secrets to
+# sign and notarize with an Apple Developer ID:
+#   APPLE_CERTIFICATE           base64 of the Developer ID Application .p12
+#   APPLE_CERTIFICATE_PASSWORD  password for the .p12
+#   APPLE_SIGNING_IDENTITY      e.g. "Developer ID Application: Name (TEAMID)"
+#   APPLE_ID                    Apple account email used for notarization
+#   APPLE_PASSWORD              app-specific password for that account
+#   APPLE_TEAM_ID               10-character team id
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    env:
+      SIGNED: ${{ secrets.APPLE_CERTIFICATE != '' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: bun install --frozen-lockfile
+
+      - name: Build, sign and notarize
+        if: env.SIGNED == 'true'
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        with:
+          tauriScript: bun run tauri
+          args: --target universal-apple-darwin
+          tagName: v__VERSION__
+          releaseName: Space Maker v__VERSION__
+          releaseDraft: true
+          releaseBody: |
+            ### Install
+            Download the `.dmg` below, open it and drag **Space Maker** to Applications. It runs on Apple Silicon and Intel Macs.
+
+            Known issues: https://github.com/bob-obringer/space-maker/issues
+
+      - name: Build (ad-hoc signed)
+        if: env.SIGNED != 'true'
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tauriScript: bun run tauri
+          args: --target universal-apple-darwin
+          tagName: v__VERSION__
+          releaseName: Space Maker v__VERSION__
+          releaseDraft: true
+          releaseBody: |
+            ### Install
+            1. Download the `.dmg` below, open it and drag **Space Maker** to Applications. It runs on Apple Silicon and Intel Macs.
+            2. The app isn't notarized yet ([#5](https://github.com/bob-obringer/space-maker/issues/5)), so the first time you open it macOS will say it can't check it for malware. Click **Done**, then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. You only need to do this once.
+
+            Or from Terminal: `xattr -dr com.apple.quarantine "/Applications/Space Maker.app"`
+
+            Known issues: https://github.com/bob-obringer/space-maker/issues

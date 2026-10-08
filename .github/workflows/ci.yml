@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - run: bun install --frozen-lockfile
+
+      # Type-checks the UI and produces dist/, which the Rust build embeds.
+      - name: Build UI
+        run: bun run build
+
+      - name: Rust tests
+        working-directory: src-tauri
+        run: cargo test

@@ -45,17 +45,25 @@ hands-on pass yet.
 - [#3](https://github.com/bob-obringer/space-maker/issues/3) Live updates and instant launch only verified in tests and the preview
 - [#4](https://github.com/bob-obringer/space-maker/issues/4) Entire Disk scans with live updates may never settle
 - [#5](https://github.com/bob-obringer/space-maker/issues/5) Builds aren't signed or notarized
-- [#6](https://github.com/bob-obringer/space-maker/issues/6) No release pipeline or downloadable .dmg
 - [#7](https://github.com/bob-obringer/space-maker/issues/7) Trash uses the path from the scan, which can be stale
 - [#8](https://github.com/bob-obringer/space-maker/issues/8) Copy Path may silently fail in the app
 - [#9](https://github.com/bob-obringer/space-maker/issues/9) No screenshot in the README
 - [#10](https://github.com/bob-obringer/space-maker/issues/10) The map isn't accessible to VoiceOver
 
+## Download
+
+Grab the `.dmg` from the [latest release](https://github.com/bob-obringer/space-maker/releases/latest).
+It runs on Apple Silicon and Intel Macs.
+
+The app isn't notarized yet ([#5](https://github.com/bob-obringer/space-maker/issues/5)).
+The first time you open it, macOS will say it can't check it for malware.
+Click **Done**, then go to **System Settings → Privacy & Security** and click
+**Open Anyway**. You only need to do this once.
+
 ## Building it
 
-There's no signed download yet, so build it yourself. You need macOS,
-[Rust](https://rustup.rs), [Bun](https://bun.sh) and the Xcode command line
-tools.
+You need macOS, [Rust](https://rustup.rs), [Bun](https://bun.sh) and the Xcode
+command line tools.
 
 ```bash
 git clone https://github.com/bob-obringer/space-maker
@@ -75,6 +83,14 @@ cd src-tauri && cargo test      # scanner tests
 cargo test --release bench_home -- --ignored --nocapture   # read-only scan of ~
 bun run tauri build --bundles app
 ```
+
+### Releasing
+
+Bump the version in `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` and
+`package.json`, then push a matching tag (`git tag v0.2.0 && git push --tags`).
+The [release workflow](.github/workflows/release.yml) builds a universal `.dmg`
+and attaches it to a draft release. It signs and notarizes automatically once
+the Apple secrets listed in that file are added to the repo.
 
 ## How it works
 
